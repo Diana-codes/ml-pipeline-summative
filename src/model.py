@@ -21,11 +21,11 @@ def create_cnn_model(input_shape=(IMG_HEIGHT, IMG_WIDTH, 3), num_classes=NUM_CLA
         Flatten(),
         Dense(128, activation='relu'),
         Dropout(0.5),
-        Dense(num_classes, activation='softmax' if num_classes > 2 else 'sigmoid')
+        Dense(num_classes, activation='softmax')
     ])
 
     model.compile(optimizer='adam',
-                  loss='categorical_crossentropy' if num_classes > 2 else 'binary_crossentropy',
+                  loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
     return model
 

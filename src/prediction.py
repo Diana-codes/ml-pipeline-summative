@@ -3,9 +3,9 @@ from tensorflow.keras.models import load_model
 import numpy as np
 import os
 
-MODEL_PATH = '../models/image_classifier_model.tf'
+MODEL_PATH = 'models/image_classifier_model.h5'
 # This will be dynamically set when the model is loaded or retrained
-CLASS_NAMES = ['class_a', 'class_b']
+CLASS_NAMES = ['cats', 'dogs']
 
 _model = None # Global variable to store the loaded model
 _class_names = None # Global variable to store class names
