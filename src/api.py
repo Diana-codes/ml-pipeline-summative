@@ -12,12 +12,13 @@ from src.model import create_cnn_model, train_model
 from src.prediction import load_ml_model, predict_image
 
 app = Flask(__name__)
+CORS(app)
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
 RETRAIN_DATA_FOLDER = 'retrain_data'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'zip'}
-MODEL_PATH = '../models/image_classifier_model.tf'
+MODEL_PATH = 'models/image_classifier_model.h5'
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RETRAIN_DATA_FOLDER, exist_ok=True)
