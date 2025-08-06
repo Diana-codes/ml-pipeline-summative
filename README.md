@@ -30,8 +30,6 @@ This project provides a complete end-to-end machine learning pipeline for image 
     *   [Data Visualizations & Interpretations](#data-visualizations--interpretations)
 *   [Results from Flood Request Simulation](#results-from-flood-request-simulation)
 *   [Deployment on Vercel](#deployment-on-vercel)
-*   [Troubleshooting](#troubleshooting)
-*   [Future Enhancements](#future-enhancements)
 
 ## Features
 
@@ -224,32 +222,3 @@ This project is configured for deployment on Vercel as a monorepo, handling both
         git push origin main # Or your branch name
         \`\`\`
     *   This ensures large files are handled correctly during deployment, avoiding "Size of uploaded file exceeds 300MB" errors.
-
-## Troubleshooting
-
-*   **"Cannot find module" errors (Python):** Ensure your virtual environment is activated and `pip install -r requirements.txt` was run successfully.
-*   **"Cannot find module" errors (Next.js):** Ensure `pnpm install` (or `npm install`) was run.
-*   **CUDA errors / TensorFlow issues:** The `src/api.py` is configured to force TensorFlow to use the CPU (`os.environ['CUDA_VISIBLE_DEVICES'] = '-1'`). If you intend to use GPU, you'll need to adjust this and ensure CUDA/cuDNN are correctly set up for your TensorFlow version.
-*   **CORS Policy Blocked:** Ensure `flask-cors` is installed (`pip install flask-cors`) and enabled in `src/api.py` (`CORS(app)`).
-*   **"Model not found" / "Prediction failed: list index out of range":**
-    *   Verify `scripts/setup_data.py` has been run to populate the `data` directory.
-    *   Verify `notebook/image_classification_pipeline.ipynb` has been run to train and save the model to `models/image_classifier_model.h5`.
-    *   Check the terminal output of your Flask API for specific error messages.
-*   **"404: NOT_FOUND" for API endpoints (`/data-insights`, `/predict`):**
-    *   Ensure your Flask API (`src/api.py`) is running on `http://localhost:5000`.
-    *   Verify the endpoint paths in `src/api.py` match those in `app/page.tsx`.
-    *   Check your Vercel deployment logs if the issue occurs on deployment; ensure `vercel.json` is correctly routing API requests.
-*   **Empty Data Visualizations:**
-    *   Confirm that `scripts/setup_data.py` successfully downloaded and organized images into `data/train/cats` and `data/train/dogs`.
-    *   Check the Flask API's terminal output for debug messages from the `/data-insights` endpoint to see if it's finding image files.
-*   **Chart Bars are Black:** The `ChartContainer` in `app/page.tsx` has been updated to use a direct HSL color value for the bars to ensure visibility. If they are still black, ensure you have the latest `app/page.tsx` code and have restarted your Next.js development server.
-
-## Future Enhancements
-
-*   **User Authentication:** Implement user login/signup for secure access to the dashboard.
-*   **Model Versioning:** Manage different versions of the trained model.
-*   **Advanced Monitoring:** Integrate with external monitoring tools (e.g., Prometheus, Grafana) for real-time performance metrics.
-*   **More Data Visualizations:** Add more charts (e.g., confusion matrix, ROC curve) for deeper model and data insights.
-*   **Deployment Automation:** Set up CI/CD pipelines for automated testing and deployment.
-*   **Scalability:** Explore containerization (Docker) for the Flask API and deployment on cloud platforms like AWS, GCP, or Azure.
-*   **Frontend Improvements:** Enhance UI/UX, add loading indicators, and better error handling.
