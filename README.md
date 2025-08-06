@@ -195,15 +195,27 @@ Ensure `setup_data.py` has been run to populate the `data` directory for these v
 
 This section presents the results of a load test performed using Locust.io on the API endpoints.
 
-\`\`\`png file="public/images/locust-results.png" url="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-q7RlHvQa5RC3XAyK6HO1Jtylr2QwRN.png"
-\`\`\`
+![Locust Results](public/locust-result.png)
 
 **Interpretation of Results:**
 
-The simulation was run with 20 users, achieving an aggregated 2 Requests Per Second (RPS) with a concerning 33% failure rate.
+The simulation was run with **20 users**, generating a total of **941 requests** (RPS: **0.7**) and a **10% failure rate**.
 
-*   **`/data-insights` (GET):** This endpoint shows very high latency, with an average response time of approximately 171.58 seconds (171580.51 ms) and a median of 108 seconds. This indicates that fetching data insights is a very slow operation, likely due to the extensive image processing involved in calculating dimensions and class distributions. However, it had 0 failures.
-*   **`/predict` (POST):** This endpoint has significantly lower latency, with an average response time of 585.14 ms and a median of 400 ms. While faster, it experienced a high number of failures (120 out of 283 requests), contributing heavily to the overall 33% failure rate. This suggests issues with the prediction process under load, possibly related to resource contention or specific error handling.
+- **GET `/data-insights`:**
+  - ✅ **0 failures**
+  - 🕒 Median response time: **120s**
+  - 📈 Indicates this endpoint is heavy—likely due to filesystem or image processing.
+
+- **POST `/predict`:**
+  - ⚠️ **96 failures out of 648 requests**
+  - ⏱️ Median response time: **400ms**, average: **414ms**
+  - 🔍 Failures suggest issues under concurrent loads—investigate error handling and model inference under stress.
+
+**Summary:**
+
+- Optimize `/data-insights` for faster performance.
+- Improve robustness and concurrency handling for `/predict`.
+
 
 **Key Takeaways:**
 
