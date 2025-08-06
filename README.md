@@ -199,23 +199,25 @@ This section presents the results of a load test performed using Locust.io on th
 
 **Interpretation of Results:**
 
-The simulation was run with **20 users**, generating a total of **941 requests** (RPS: **0.7**) and a **10% failure rate**.
+The simulation was run with **20 users**, generating a total of **1,109 requests** (RPS: **0.7**) and a **10% failure rate**.
 
 - **GET `/data-insights`:**
   - ✅ **0 failures**
-  - 🕒 Median response time: **120s**
-  - 📈 Indicates this endpoint is heavy—likely due to filesystem or image processing.
+  - 🕒 Median response time: **122s**
+  - 📈 Indicates this endpoint is heavy—likely due to extensive image processing.
 
 - **POST `/predict`:**
-  - ⚠️ **96 failures out of 648 requests**
-  - ⏱️ Median response time: **400ms**, average: **414ms**
-  - 🔍 Failures suggest issues under concurrent loads—investigate error handling and model inference under stress.
+  - ⚠️ **110 failures out of 770 requests** (~14.3% failure rate)
+  - ⏱️ Median response time: **400ms**, average: **417ms**
+  - 🔍 Suggests the model serving pipeline breaks under load—likely due to concurrent access or image issues.
 
 **Summary:**
 
-- Optimize `/data-insights` for faster performance.
-- Improve robustness and concurrency handling for `/predict`.
-
+- Optimize `/data-insights` for performance using caching or pre-computed stats.
+- Improve robustness of `/predict` endpoint by:
+  - Keeping the model loaded in memory.
+  - Validating images earlier.
+  - Increasing server capacity if needed.
 
 **Key Takeaways:**
 
