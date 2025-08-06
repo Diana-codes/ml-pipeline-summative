@@ -3,7 +3,7 @@ from tensorflow.keras.models import load_model
 import numpy as np
 import os
 
-MODEL_PATH = 'models/image_classifier_model.h5'
+MODEL_PATH = '../models/image_classifier_model.h5' # Corrected path
 # This will be dynamically set when the model is loaded or retrained
 CLASS_NAMES = ['cats', 'dogs']
 
@@ -30,14 +30,21 @@ def load_ml_model(model_path=MODEL_PATH):
             # In a robust system, you'd save class_indices from ImageDataGenerator.
             from src.preprocessing import create_data_generator
             temp_data_dir = '../data/train' # Assuming original training data is here
+            print(f"DEBUG (prediction.py): Checking temp_data_dir: {temp_data_dir}") # Added debug print
             if os.path.exists(temp_data_dir):
-                _, class_indices = create_data_generator(temp_data_dir, shuffle=False, is_training=False)
+                # Added debug print for flow_from_directory
+                print(f"DEBUG (prediction.py): Attempting to create data generator from {temp_data_dir}")
+                generator, class_indices = create_data_generator(temp_data_dir, shuffle=False, is_training=False)
                 _class_names = sorted(class_indices, key=class_indices.get)
-                print(f"Inferred class names: {_class_names}")
+                print(f"DEBUG (prediction.py): Inferred class names: {_class_names}") # Added debug print
+                print(f"DEBUG (prediction.py): Class indices from generator: {class_indices}") # Added debug print
+                if not _class_names: # Added check for empty class names
+                    print("WARNING (prediction.py): Inferred class names list is empty. This might cause 'list index out of range' errors.")
             else:
+                print(f"DEBUG (prediction.py): temp_data_dir does not exist: {temp_data_dir}. Falling back to default CLASS_NAMES.") # Added debug print
                 _class_names = CLASS_NAMES # Fallback to default
         except Exception as e:
-            print(f"Could not infer class names from data directory: {e}. Using default.")
+            print(f"ERROR (prediction.py): Could not infer class names from data directory: {e}. Using default.") # Added debug print
             _class_names = CLASS_NAMES
     return _model, _class_names
 
@@ -46,6 +53,7 @@ def predict_image(preprocessed_image_array):
     Makes a prediction on a preprocessed image array.
     """
     model, class_names = load_ml_model()
+    print(f"DEBUG (predict_image): Using class_names: {class_names}") # Added debug print
     predictions = model.predict(preprocessed_image_array)
 
     if len(class_names) > 2: # Multi-class classification
@@ -55,10 +63,21 @@ def predict_image(preprocessed_image_array):
         predicted_class_index = (predictions > 0.5).astype(int)[0][0]
         confidence = predictions[0][0] if predicted_class_index == 1 else (1 - predictions[0][0])
 
-    predicted_class_name = class_names[predicted_class_index]
+    # Added check before accessing class_names
+    if not class_names or predicted_class_index >= len(class_names) or predicted_class_index < 0:
+        print(f"ERROR (predict_image): Invalid predicted_class_index ({predicted_class_index}) or empty class_names ({class_names}).")
+        # Fallback or raise a more specific error
+        predicted_class_name = "unknown"
+    else:
+        predicted_class_name = class_names[predicted_class_index]
 
     return {
         "predicted_class": predicted_class_name,
         "confidence": float(confidence),
         "raw_predictions": predictions.tolist()
     }
+
+def reset_model_cache():
+    global _model, _class_names
+    _model = None
+    _class_names = None
