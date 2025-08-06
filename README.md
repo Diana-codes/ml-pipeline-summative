@@ -190,53 +190,22 @@ Ensure `setup_data.py` has been run to populate the `data` directory for these v
 
 ## Results from Flood Request Simulation
 
-This section would typically contain the results of performance testing, such as a flood request simulation on the API endpoints. These simulations help assess the API's robustness and scalability under heavy load.
+This section presents the results of a load test performed using Locust.io on the API endpoints.
 
-**Example Metrics to Include:**
-*   **Requests Per Second (RPS):** How many requests the API can handle per second.
-*   **Latency (Average, P90, P99):** The time taken for requests to be processed.
-*   **Error Rate:** Percentage of failed requests.
-*   **Throughput:** Total data processed over time.
-*   **Resource Utilization:** CPU, Memory usage during the test.
-
-**How to Run a Simulation (Example using `hey` or `locust`):**
-
-You can use tools like `hey` (formerly `bombardier`) or `locust` to simulate concurrent requests.
-
-**Using `hey` (for simple load testing):**
-\`\`\`bash
-# Install hey
-go install github.com/rakyll/hey@latest
-
-# Example: 100 concurrent requests, 1000 total requests to the predict endpoint
-hey -n 1000 -c 100 -m POST -T "image/jpeg" -D @path/to/your/test_image.jpg http://localhost:5000/predict
+\`\`\`png file="public/images/locust-results.png" url="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-q7RlHvQa5RC3XAyK6HO1Jtylr2QwRN.png"
 \`\`\`
 
-**Using `locust` (for more complex user behavior simulation):**
-\`\`\`python
-# Example locustfile.py
-from locust import HttpUser, task, between
+**Interpretation of Results:**
 
-class MLUser(HttpUser):
-    wait_time = between(1, 2) # seconds
+The simulation was run with 20 users, achieving an aggregated 2 Requests Per Second (RPS) with a concerning 33% failure rate.
 
-    @task
-    def predict_image(self):
-        # Replace with a path to a small test image
-        with open("path/to/your/test_image.jpg", "rb") as image_file:
-            self.client.post("/predict", files={"file": image_file})
+*   **`/data-insights` (GET):** This endpoint shows very high latency, with an average response time of approximately 171.58 seconds (171580.51 ms) and a median of 108 seconds. This indicates that fetching data insights is a very slow operation, likely due to the extensive image processing involved in calculating dimensions and class distributions. However, it had 0 failures.
+*   **`/predict` (POST):** This endpoint has significantly lower latency, with an average response time of 585.14 ms and a median of 400 ms. While faster, it experienced a high number of failures (120 out of 283 requests), contributing heavily to the overall 33% failure rate. This suggests issues with the prediction process under load, possibly related to resource contention or specific error handling.
 
-    @task
-    def get_insights(self):
-        self.client.get("/data-insights")
-\`\`\`
-Then run: `locust -f your_locustfile.py` and access the web UI at `http://localhost:8089`.
+**Key Takeaways:**
 
----
-
-**[Insert your actual simulation results here, e.g., graphs, tables, key findings]**
-
----
+*   The `/data-insights` endpoint needs significant optimization to reduce its extremely high response times.
+*   The `/predict` endpoint, despite better latency, has a critical failure rate that needs immediate investigation and resolution to ensure reliability.
 
 ## Deployment on Vercel
 
