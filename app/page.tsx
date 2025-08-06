@@ -2,14 +2,32 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import Image from "next/image"
-import { Loader2, Upload, RefreshCw, BarChart, ImageIcon } from "lucide-react"
+import { Loader2, Upload, RefreshCw, BarChart, ImageIcon } from 'lucide-react'
+
+// Import Recharts components for the chart
+import { BarChart as RechartsBarChart, Bar, XAxis, YAxis, ResponsiveContainer } from "recharts"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+
+interface DataInsights {
+  class_distribution: { [key: string]: number }
+  sample_images: { [key: string]: string[] }
+  image_dimensions: {
+    min_width: number
+    max_width: number
+    avg_width: number
+    min_height: number
+    max_height: number
+    avg_height: number
+    total_images: number
+  }
+}
 
 export default function MLPipelinePage() {
   const [predictionFile, setPredictionFile] = useState<File | null>(null)
@@ -20,6 +38,31 @@ export default function MLPipelinePage() {
   const [retrainLoading, setRetrainLoading] = useState(false)
   const [predictionError, setPredictionError] = useState<string | null>(null)
   const [retrainError, setRetrainError] = useState<string | null>(null)
+  const [dataInsights, setDataInsights] = useState<DataInsights | null>(null)
+  const [insightsLoading, setInsightsLoading] = useState(true)
+  const [insightsError, setInsightsError] = useState<string | null>(null)
+
+  const API_BASE_URL = "http://localhost:5000" // Define API base URL
+
+  // Fetch data insights on component mount
+  useEffect(() => {
+    const fetchInsights = async () => {
+      try {
+        setInsightsLoading(true)
+        const response = await fetch(`${API_BASE_URL}/data-insights`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch data insights.")
+        }
+        const data: DataInsights = await response.json()
+        setDataInsights(data)
+      } catch (error: any) {
+        setInsightsError(error.message || "An error occurred while loading insights.")
+      } finally {
+        setInsightsLoading(false)
+      }
+    }
+    fetchInsights()
+  }, [])
 
   const handlePredictionFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -43,8 +86,7 @@ export default function MLPipelinePage() {
     formData.append("file", predictionFile)
 
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:5000/predict", {
+      const response = await fetch(`${API_BASE_URL}/predict`, {
         method: "POST",
         body: formData,
       })
@@ -85,8 +127,7 @@ export default function MLPipelinePage() {
     formData.append("data_zip", retrainFile)
 
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch("http://localhost:5000/retrain", {
+      const response = await fetch(`${API_BASE_URL}/retrain`, {
         method: "POST",
         body: formData,
       })
@@ -98,12 +139,26 @@ export default function MLPipelinePage() {
 
       const data = await response.json()
       setRetrainResult(data)
+      // Re-fetch insights after successful retraining
+      const insightsResponse = await fetch(`${API_BASE_URL}/data-insights`)
+      if (insightsResponse.ok) {
+        const newInsights: DataInsights = await insightsResponse.json()
+        setDataInsights(newInsights)
+      }
     } catch (error: any) {
       setRetrainError(error.message || "An unexpected error occurred during retraining.")
     } finally {
       setRetrainLoading(false)
     }
   }
+
+  // Transform class distribution data for the chart
+  const chartData = dataInsights?.class_distribution
+    ? Object.entries(dataInsights.class_distribution).map(([name, count]) => ({
+        name,
+        count,
+      }))
+    : []
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -211,50 +266,122 @@ export default function MLPipelinePage() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-gray-600">
-              This section would typically display insights from your dataset. For image data, this could include:
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>
-                <strong>Feature 1: Class Distribution:</strong> A bar chart showing the number of images per class in
-                your training dataset.
-                <p className="text-sm text-gray-500 italic">
-                  Interpretation: This tells you if your dataset is balanced or imbalanced. An imbalanced dataset might
-                  lead to the model performing well on the majority class but poorly on minority classes.
+            {insightsLoading && <p className="text-gray-500">Loading data insights...</p>}
+            {insightsError && <p className="text-red-500">{insightsError}</p>}
+            {dataInsights && (
+              <>
+                <p className="text-gray-600">
+                  This section displays insights from your dataset, helping you understand its characteristics.
                 </p>
-                <div className="mt-2 w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-md">
-                  [Placeholder: Bar Chart of Class Distribution]
-                </div>
-              </li>
-              <li>
-                <strong>Feature 2: Sample Images per Class:</strong> A grid displaying a few representative images from
-                each class.
-                <p className="text-sm text-gray-500 italic">
-                  Interpretation: This helps you understand the visual characteristics of each class and identify
-                  potential challenges (e.g., similar-looking classes, variations within a class).
-                </p>
-                <div className="mt-2 w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-md">
-                  [Placeholder: Grid of Sample Images]
-                </div>
-              </li>
-              <li>
-                <strong>Feature 3: Image Dimensions/Resolution:</strong> A histogram or scatter plot showing the
-                distribution of image heights and widths.
-                <p className="text-sm text-gray-500 italic">
-                  Interpretation: Understanding the original image sizes can inform your preprocessing strategy (e.g.,
-                  choosing an appropriate `target_size` for resizing). Very diverse sizes might indicate a need for more
-                  robust resizing or cropping.
-                </p>
-                <div className="mt-2 w-full h-48 bg-gray-200 flex items-center justify-center text-gray-500 rounded-md">
-                  [Placeholder: Histogram of Image Dimensions]
-                </div>
-              </li>
-            </ul>
-            <Textarea
-              placeholder="Add your detailed interpretations here based on your actual data visualizations."
-              rows={5}
-              className="mt-4"
-            />
+                <ul className="list-disc list-inside space-y-2 text-gray-700">
+                  <li>
+                    <strong>Feature 1: Class Distribution:</strong>
+                    <p className="text-sm text-gray-500 italic">
+                      Interpretation: This tells you if your dataset is balanced or imbalanced. An imbalanced dataset
+                      might lead to the model performing well on the majority class but poorly on minority classes.
+                    </p>
+                    <div className="mt-2 p-4 bg-gray-100 rounded-md">
+                      {chartData.length > 0 ? (
+                        <ChartContainer
+                          config={{
+                            count: {
+                              label: "Number of Images",
+                              color: "hsl(142.1 76.2% 36.3%)", // Changed to a direct HSL value for visibility
+                            },
+                          }}
+                          className="min-h-[200px] w-full"
+                        >
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsBarChart data={chartData}>
+                              <XAxis
+                                dataKey="name"
+                                tickLine={false}
+                                axisLine={false}
+                                tickMargin={8}
+                                className="text-xs"
+                              />
+                              <YAxis tickLine={false} axisLine={false} tickMargin={8} className="text-xs" />
+                              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                              <Bar dataKey="count" fill="var(--color-count)" radius={8} />
+                            </RechartsBarChart>
+                          </ResponsiveContainer>
+                        </ChartContainer>
+                      ) : (
+                        <p className="text-gray-500">No class distribution data available. Run `setup_data.py`.</p>
+                      )}
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Feature 2: Sample Images per Class:</strong>
+                    <p className="text-sm text-gray-500 italic">
+                      Interpretation: This helps you understand the visual characteristics of each class and identify
+                      potential challenges (e.g., similar-looking classes, variations within a class).
+                    </p>
+                    <div className="mt-2 p-4 bg-gray-100 rounded-md grid grid-cols-3 gap-4">
+                      {Object.keys(dataInsights.sample_images).length > 0 ? (
+                        Object.entries(dataInsights.sample_images).map(([className, paths]: [string, string[]]) => (
+                          <div key={className} className="col-span-3">
+                            <h4 className="font-semibold text-md mb-2">{className} Samples:</h4>
+                            <div className="grid grid-cols-3 gap-2">
+                              {paths.map((path, index) => (
+                                <Image
+                                  key={index}
+                                  src={`${API_BASE_URL}/data-images/${path}`}
+                                  alt={`${className} sample ${index + 1}`}
+                                  width={100}
+                                  height={100}
+                                  className="rounded-md object-cover"
+                                  onError={(e) => {
+                                    console.error(`Error loading image: ${e.currentTarget.src}`)
+                                    e.currentTarget.src = "/placeholder.svg" // Fallback to placeholder
+                                  }}
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="col-span-3 text-gray-500">No sample images available. Run `setup_data.py`.</p>
+                      )}
+                    </div>
+                  </li>
+                  <li>
+                    <strong>Feature 3: Image Dimensions/Resolution:</strong>
+                    <p className="text-sm text-gray-500 italic">
+                      Interpretation: Understanding the original image sizes can inform your preprocessing strategy
+                      (e.g., choosing an appropriate `target_size` for resizing). Very diverse sizes might indicate a
+                      need for more robust resizing or cropping.
+                    </p>
+                    <div className="mt-2 p-4 bg-gray-100 rounded-md">
+                      {dataInsights.image_dimensions.total_images > 0 ? (
+                        <>
+                          <p>
+                            <strong>Total Images Analyzed:</strong> {dataInsights.image_dimensions.total_images}
+                          </p>
+                          <p>
+                            <strong>Width:</strong> Min {dataInsights.image_dimensions.min_width}px, Max{" "}
+                            {dataInsights.image_dimensions.max_width}px, Avg{" "}
+                            {dataInsights.image_dimensions.avg_width.toFixed(2)}px
+                          </p>
+                          <p>
+                            <strong>Height:</strong> Min {dataInsights.image_dimensions.min_height}px, Max{" "}
+                            {dataInsights.image_dimensions.max_height}px, Avg{" "}
+                            {dataInsights.image_dimensions.avg_height.toFixed(2)}px
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-gray-500">No image dimension data available. Run `setup_data.py`.</p>
+                      )}
+                    </div>
+                  </li>
+                </ul>
+                <Textarea
+                  placeholder="Add your detailed interpretations here based on your actual data visualizations."
+                  rows={5}
+                  className="mt-4"
+                />
+              </>
+            )}
           </CardContent>
         </Card>
 
