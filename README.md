@@ -1,5 +1,19 @@
 # End-to-End Machine Learning Pipeline: Image Classification
 
+## Video Demo
+
+A short video demonstration of the application in action:
+
+[Watch the Demo on YouTube](YOUR_YOUTUBE_DEMO_LINK_HERE)
+
+## Live Demo
+
+You can access the live deployed version of this application here:
+
+[Live Application URL](YOUR_VERCEL_DEPLOYMENT_URL_HERE)
+
+---
+
 This project provides a complete end-to-end machine learning pipeline for image classification, featuring a Python Flask API backend for model serving and retraining, and a Next.js frontend for user interaction and data visualization.
 
 ## Table of Contents
@@ -14,6 +28,7 @@ This project provides a complete end-to-end machine learning pipeline for image 
     *   [Image Prediction](#image-prediction)
     *   [Model Retraining](#model-retraining)
     *   [Data Visualizations & Interpretations](#data-visualizations--interpretations)
+*   [Results from Flood Request Simulation](#results-from-flood-request-simulation)
 *   [Deployment on Vercel](#deployment-on-vercel)
 *   [Troubleshooting](#troubleshooting)
 *   [Future Enhancements](#future-enhancements)
@@ -80,7 +95,7 @@ This project provides a complete end-to-end machine learning pipeline for image 
 ├── postcss.config.js             # PostCSS configuration for Tailwind CSS
 ├── package.json                  # Frontend dependencies
 ├── pnpm-lock.yaml                # pnpm lock file
-├── requirements.txt              # Backend Python dependencies
+├── requirements.txt              # Backend Python Python dependencies
 ├── tailwind.config.ts            # Tailwind CSS configuration
 ├── tsconfig.json                 # TypeScript configuration
 └── vercel.json                   # Vercel deployment configuration
@@ -172,6 +187,56 @@ This section automatically fetches and displays insights from your `data/train` 
 *   **Image Dimensions/Resolution:** Provides min, max, and average dimensions of images.
 
 Ensure `setup_data.py` has been run to populate the `data` directory for these visualizations to work.
+
+## Results from Flood Request Simulation
+
+This section would typically contain the results of performance testing, such as a flood request simulation on the API endpoints. These simulations help assess the API's robustness and scalability under heavy load.
+
+**Example Metrics to Include:**
+*   **Requests Per Second (RPS):** How many requests the API can handle per second.
+*   **Latency (Average, P90, P99):** The time taken for requests to be processed.
+*   **Error Rate:** Percentage of failed requests.
+*   **Throughput:** Total data processed over time.
+*   **Resource Utilization:** CPU, Memory usage during the test.
+
+**How to Run a Simulation (Example using `hey` or `locust`):**
+
+You can use tools like `hey` (formerly `bombardier`) or `locust` to simulate concurrent requests.
+
+**Using `hey` (for simple load testing):**
+\`\`\`bash
+# Install hey
+go install github.com/rakyll/hey@latest
+
+# Example: 100 concurrent requests, 1000 total requests to the predict endpoint
+hey -n 1000 -c 100 -m POST -T "image/jpeg" -D @path/to/your/test_image.jpg http://localhost:5000/predict
+\`\`\`
+
+**Using `locust` (for more complex user behavior simulation):**
+\`\`\`python
+# Example locustfile.py
+from locust import HttpUser, task, between
+
+class MLUser(HttpUser):
+    wait_time = between(1, 2) # seconds
+
+    @task
+    def predict_image(self):
+        # Replace with a path to a small test image
+        with open("path/to/your/test_image.jpg", "rb") as image_file:
+            self.client.post("/predict", files={"file": image_file})
+
+    @task
+    def get_insights(self):
+        self.client.get("/data-insights")
+\`\`\`
+Then run: `locust -f your_locustfile.py` and access the web UI at `http://localhost:8089`.
+
+---
+
+**[Insert your actual simulation results here, e.g., graphs, tables, key findings]**
+
+---
 
 ## Deployment on Vercel
 
