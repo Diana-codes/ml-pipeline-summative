@@ -67,38 +67,38 @@ This project provides a complete end-to-end machine learning pipeline for image 
 
 \`\`\`
 .
-├── app/                          # Next.js frontend (App Router)
-│   └── page.tsx                  # Main dashboard page
-├── components/                   # Reusable React components (e.g., shadcn/ui)
-├── data/                         # Stores downloaded and organized image data (train/test)
+├── app/                                # Next.js frontend (App Router)
+│   └── page.tsx                        # Main dashboard page
+├── components/                         # Reusable React components (e.g., shadcn/ui)
+├── data/                               # Stores downloaded and organized image data (train/test)
 │   ├── train/
 │   │   ├── cats/
 │   │   └── dogs/
 │   └── test/
 │       ├── cats/
 │       └── dogs/
-├── models/                       # Stores the trained ML model
+├── models/                             # Stores the trained ML model
 │   └── image_classifier_model.h5
 ├── notebook/
 │   └── image_classification_pipeline.ipynb # Jupyter Notebook for training
-├── public/                       # Static assets for Next.js
+├── public/                             # Static assets for Next.js
 ├── scripts/
-│   ├── setup_data.py             # Script to download and organize dataset
-│   └── check_data_contents.py    # Utility to check data directories
-├── src/                          # Python backend source code
-│   ├── api.py                    # Flask API endpoints
-│   ├── model.py                  # ML model definition and training functions
-│   ├── prediction.py             # Model loading and prediction logic
-│   └── preprocessing.py          # Image preprocessing utilities
-├── .gitattributes                # Git LFS configuration
-├── next.config.mjs               # Next.js configuration
-├── postcss.config.js             # PostCSS configuration for Tailwind CSS
-├── package.json                  # Frontend dependencies
-├── pnpm-lock.yaml                # pnpm lock file
-├── requirements.txt              # Backend Python Python dependencies
-├── tailwind.config.ts            # Tailwind CSS configuration
-├── tsconfig.json                 # TypeScript configuration
-└── vercel.json                   # Vercel deployment configuration
+│   ├── setup_data.py                   # Script to download and organize dataset
+│   └── check_data_contents.py          # Utility to check data directories
+├── src/                                # Python backend source code
+│   ├── api.py                          # Flask API endpoints
+│   ├── model.py                        # ML model definition and training functions
+│   ├── prediction.py                   # Model loading and prediction logic
+│   └── preprocessing.py                # Image preprocessing utilities
+├── .gitattributes                      # Git LFS configuration
+├── next.config.mjs                     # Next.js configuration
+├── postcss.config.js                   # PostCSS configuration for Tailwind CSS
+├── package.json                        # Frontend dependencies
+├── pnpm-lock.yaml                      # pnpm lock file
+├── requirements.txt                    # Backend Python dependencies
+├── tailwind.config.ts                  # Tailwind CSS configuration
+├── tsconfig.json                       # TypeScript configuration
+└── vercel.json                         # Vercel deployment configuration
 \`\`\`
 
 ## Setup Instructions
