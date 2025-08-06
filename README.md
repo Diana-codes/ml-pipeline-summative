@@ -63,41 +63,46 @@ This project provides a complete end-to-end machine learning pipeline for image 
 
 ## Project Structure
 
-\`\`\`
-.
-├── app/                                # Next.js frontend (App Router)
-│   └── page.tsx                        # Main dashboard page
-├── components/                         # Reusable React components (e.g., shadcn/ui)
-├── data/                               # Stores downloaded and organized image data (train/test)
+```
+ML-Pipeline-Summative/
+│
+├── README.md                            ← Project overview and documentation
+├── app/                                 ← Next.js frontend (App Router)
+│   └── page.tsx                         ← Main dashboard page
+├── components/                          ← Reusable React components (e.g., shadcn/ui)
+├── data/                                ← Organized image data (training/testing)
 │   ├── train/
 │   │   ├── cats/
 │   │   └── dogs/
 │   └── test/
 │       ├── cats/
 │       └── dogs/
-├── models/                             # Stores the trained ML model
+├── models/                              ← Saved ML model (.h5)
 │   └── image_classifier_model.h5
 ├── notebook/
-│   └── image_classification_pipeline.ipynb # Jupyter Notebook for training
-├── public/                             # Static assets for Next.js
-├── scripts/
-│   ├── setup_data.py                   # Script to download and organize dataset
-│   └── check_data_contents.py          # Utility to check data directories
-├── src/                                # Python backend source code
-│   ├── api.py                          # Flask API endpoints
-│   ├── model.py                        # ML model definition and training functions
-│   ├── prediction.py                   # Model loading and prediction logic
-│   └── preprocessing.py                # Image preprocessing utilities
-├── .gitattributes                      # Git LFS configuration
-├── next.config.mjs                     # Next.js configuration
-├── postcss.config.js                   # PostCSS configuration for Tailwind CSS
-├── package.json                        # Frontend dependencies
-├── pnpm-lock.yaml                      # pnpm lock file
-├── requirements.txt                    # Backend Python dependencies
-├── tailwind.config.ts                  # Tailwind CSS configuration
-├── tsconfig.json                       # TypeScript configuration
-└── vercel.json                         # Vercel deployment configuration
-\`\`\`
+│   └── image_classification_pipeline.ipynb ← Jupyter notebook for training
+├── public/                              ← Static assets for frontend (e.g., locust results)
+│   └── images/
+│       └── locust-results.png
+├── scripts/                             ← Dataset preparation utilities
+│   ├── setup_data.py                    ← Download and organize dataset
+│   └── check_data_contents.py          ← Check folder structure and stats
+├── src/                                 ← Python Flask backend
+│   ├── api.py                           ← Flask API endpoints
+│   ├── model.py                         ← Model definition and training
+│   ├── prediction.py                    ← Prediction logic
+│   └── preprocessing.py                 ← Image preprocessing utilities
+├── .gitattributes                       ← Git LFS configuration
+├── locustfile.py                        ← Locust load test file (flood simulation)
+├── next.config.mjs                      ← Next.js build config
+├── postcss.config.js                    ← PostCSS (Tailwind CSS config)
+├── package.json                         ← Frontend dependencies
+├── pnpm-lock.yaml                       ← pnpm lockfile
+├── requirements.txt                     ← Python dependencies
+├── tailwind.config.ts                   ← Tailwind CSS configuration
+├── tsconfig.json                        ← TypeScript configuration
+└── vercel.json                          ← Vercel deployment configuration
+```
 
 ## Setup Instructions
 
