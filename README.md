@@ -10,7 +10,7 @@ A short video demonstration of the application in action:
 
 You can access the live deployed version of this application here:
 
-[Live Application URL](YOUR_VERCEL_DEPLOYMENT_URL_HERE)
+[Live Application URL](https://ml-pipeline-summative-three.vercel.app/)
 
 ---
 
