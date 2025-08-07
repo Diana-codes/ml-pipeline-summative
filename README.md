@@ -4,8 +4,7 @@
 
 A short video demonstration of the application in action:
 
-[Watch the Demo on YouTube](beesy_recording-2025_08_07_00_51_06-pqg_pjrh_yfo.webm
-)
+[Watch the Demo on YouTube](https://youtu.be/q68DtV-E5EM)
 
 ## Live Demo
 
